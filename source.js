@@ -1,81 +1,75 @@
-const canvas = document.getElementById("webgl-canvas");
-
-/**@type {WebGL2RenderingContext} */
-const gl = canvas.getContext("webgl2");
-if (!gl)
+async function LoadShaderSrc(path)
 {
-    console.error("WebGL2 not supported: Update your browser or use a compatible device.");
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`Failed to load shader: ${response.statusText}`)
+    return await response.text();
 }
 
-const vertSource = 
-`   #version 300 es
-    precision mediump float;
+async function main()
+{
+    const canvas = document.getElementById("webgl-canvas");
 
-    in vec3 aPosition;
-
-    void main()
+    /**@type {WebGL2RenderingContext} */
+    const gl = canvas.getContext("webgl2");
+    if (!gl)
     {
-        gl_Position = vec4(aPosition, 1.0);
+        console.error("WebGL2 not supported: Update your browser or use a compatible device.");
     }
-`;
 
-const fragSource =
-`   #version 300 es
-    precision mediump float;
-
-    out vec4 FragColor;
-
-    void main()
+    const vertSrc = await LoadShaderSrc("./assets/shaders/vertex.vs");
+    const fragSrc = await LoadShaderSrc("./assets/shaders/fragment.fs");
+    
+    console.log(vertSrc);
+    console.log(fragSrc);
+    
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertSrc);
+    gl.compileShader(vertexShader);
+    
+    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
     {
-        FragColor = vec4(1.0);
+        const infoLog = gl.getShaderInfoLog(vertexShader);
+        console.error("Vertex Shader Compilation Error: " + infoLog);
     }
-`;
-
-const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-gl.shaderSource(vertexShader, vertSource);
-gl.compileShader(vertexShader);
-
-if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS))
-{
-    const infoLog = gl.getShaderInfoLog(vertexShader);
-    console.error("Vertex Shader Compilation Error: " + infoLog);
-}
-
-const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-gl.shaderSource(fragShader, fragSource);
-gl.compileShader(fragShader);
-
-if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS))
-{
-    const infoLog = gl.getShaderInfoLog(fragShader);
-    console.error("Fragment Shader Compilation Error: " + infoLog);
-}
-
-const shaderProgram = gl.createProgram()
-gl.attachShader(shaderProgram, vertexShader);
-gl.attachShader(shaderProgram, fragShader);
-gl.linkProgram(shaderProgram);
-
-if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-{
-    const infoLog = gl.getProgramInfoLog(shaderProgram);
-    console.error("Shader Program Linking Error: " + infoLog);
-}
-
-gl.detachShader(shaderProgram, vertexShader);
-gl.detachShader(shaderProgram, fragShader);
-
-gl.deleteShader(vertexShader);
-gl.deleteShader(fragShader);
-
-gl.useProgram(shaderProgram);
-
-function RenderLoop()
-{
-    gl.clearColor(0.1, 0.1, 0.1, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
+    
+    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragShader, fragSrc);
+    gl.compileShader(fragShader);
+    
+    if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS))
+    {
+        const infoLog = gl.getShaderInfoLog(fragShader);
+        console.error("Fragment Shader Compilation Error: " + infoLog);
+    }
+    
+    const shaderProgram = gl.createProgram()
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragShader);
+    gl.linkProgram(shaderProgram);
+    
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+    {
+        const infoLog = gl.getProgramInfoLog(shaderProgram);
+        console.error("Shader Program Linking Error: " + infoLog);
+    }
+    
+    gl.detachShader(shaderProgram, vertexShader);
+    gl.detachShader(shaderProgram, fragShader);
+    
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragShader);
+    
+    gl.useProgram(shaderProgram);
+    
+    function RenderLoop()
+    {
+        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    
+        requestAnimationFrame(RenderLoop);
+    }
+    
     requestAnimationFrame(RenderLoop);
 }
 
-requestAnimationFrame(RenderLoop);
+main();
