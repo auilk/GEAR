@@ -1,3 +1,12 @@
+const canvas = document.getElementById("webgl-canvas");
+
+/**@type {WebGL2RenderingContext} */
+const gl = canvas.getContext("webgl2");
+if (!gl)
+{
+    console.error("WebGL2 not supported: Update your browser or use a compatible device.");
+}
+
 async function LoadShaderSrc(path)
 {
     const response = await fetch(path);
@@ -5,17 +14,15 @@ async function LoadShaderSrc(path)
     return await response.text();
 }
 
+function ResizeCallback()
+{
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
 async function main()
 {
-    const canvas = document.getElementById("webgl-canvas");
-
-    /**@type {WebGL2RenderingContext} */
-    const gl = canvas.getContext("webgl2");
-    if (!gl)
-    {
-        console.error("WebGL2 not supported: Update your browser or use a compatible device.");
-    }
-
     const vertSrc = await LoadShaderSrc("./assets/shaders/vertex.vs");
     const fragSrc = await LoadShaderSrc("./assets/shaders/fragment.fs");
     
@@ -86,7 +93,7 @@ async function main()
     gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosLoc);
 
-    function RenderLoop()
+    const RenderLoop = () =>
     {
         gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -97,6 +104,9 @@ async function main()
     }
     
     requestAnimationFrame(RenderLoop);
+    
+    window.addEventListener("resize", ResizeCallback);
+    ResizeCallback();
 }
 
 main();
