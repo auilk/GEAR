@@ -60,11 +60,38 @@ async function main()
     gl.deleteShader(fragShader);
     
     gl.useProgram(shaderProgram);
-    
+
+    const vertices = new Float32Array([
+         0.0,  1.0,
+        -1.0, -1.0,
+         1.0, -1.0
+    ]);
+
+    const indices = new Uint32Array([
+        0, 1, 2
+    ]);
+
+    const VAO = gl.createVertexArray();
+    gl.bindVertexArray(VAO);
+
+    const VBO = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    const EBO = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+    const aPosLoc = gl.getAttribLocation(shaderProgram, "aPosition")
+    gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(aPosLoc);
+
     function RenderLoop()
     {
         gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_INT, 0);
     
         requestAnimationFrame(RenderLoop);
     }
