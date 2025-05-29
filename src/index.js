@@ -1,13 +1,10 @@
+import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
 
 const canvas = document.getElementById("webgl-canvas");
 
-/**@type {WebGL2RenderingContext} */
-const gl = canvas.getContext("webgl2");
-if (!gl)
-{
-    console.error("WebGL2 not supported: Update your browser or use a compatible device.");
-}
+WebGLContext.Init(canvas);
+const gl = WebGLContext.GetContext();
 
 async function LoadShaderSrc(path)
 {
@@ -28,7 +25,7 @@ async function main()
     const vertSrc = await LoadShaderSrc("./assets/shaders/vertex.vs");
     const fragSrc = await LoadShaderSrc("./assets/shaders/fragment.fs");
 
-    const shader = new Shader(gl, vertSrc, fragSrc);
+    const shader = new Shader(vertSrc, fragSrc);
     shader.Bind();
 
     const vertices = new Float32Array([

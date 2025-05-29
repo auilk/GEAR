@@ -1,3 +1,5 @@
+import WebGLContext from "../core/webgl-context.js";
+
 class Shader
 {
     #gl;
@@ -5,12 +7,12 @@ class Shader
     #fragShader;
     #program;
 
-    constructor(gl, vertSource, fragSource)
+    constructor(vertSource, fragSource)
     {
-        this.#gl = gl;
+        this.#gl = WebGLContext.GetContext();
         
-        this.#vertShader = this.#CreateShader(vertSource, gl.VERTEX_SHADER);
-        this.#fragShader = this.#CreateShader(fragSource, gl.FRAGMENT_SHADER);
+        this.#vertShader = this.#CreateShader(vertSource, this.#gl.VERTEX_SHADER);
+        this.#fragShader = this.#CreateShader(fragSource, this.#gl.FRAGMENT_SHADER);
 
         this.#program = this.#CreateProgram(this.#vertShader, this.#fragShader);
     }
