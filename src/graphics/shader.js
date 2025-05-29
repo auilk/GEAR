@@ -3,20 +3,42 @@ class Shader
     #gl;
     #vertShader;
     #fragShader;
+    #program;
 
-    /**
-     * @param {WebGL2RenderingContext} gl 
-     * @param {string} vertSource 
-     * @param {string} fragSource 
-     */
     constructor(gl, vertSource, fragSource)
     {
         this.#gl = gl;
-
+        
         this.#vertShader = this.#CreateShader(vertSource, gl.VERTEX_SHADER);
         this.#fragShader = this.#CreateShader(fragSource, gl.FRAGMENT_SHADER);
 
-        this.program = this.#CreateProgram(this.#vertShader, this.#fragShader);
+        this.#program = this.#CreateProgram(this.#vertShader, this.#fragShader);
+    }
+
+    GetProgram()
+    {
+        return this.#program;
+    }
+    
+    Bind()
+    {
+        this.#gl.useProgram(this.#program);
+    }
+
+    Unbind()
+    {
+        this.#gl.useProgram(0);
+    }
+
+    Delete()
+    {
+        this.#gl.detachShader(this.#vertShader);
+        this.#gl.detachShader(this.#fragShader);
+
+        this.#gl.deleteShader(this.#vertShader);
+        this.#gl.deleteShader(this.#fragShader);
+
+        this.#gl.deleteProgram(this.#program);
     }
 
     #CreateShader(source, type)
@@ -59,27 +81,6 @@ class Shader
         }
 
         return program;
-    }
-
-    Bind()
-    {
-        this.#gl.useProgram(this.program);
-    }
-
-    Unbind()
-    {
-        this.#gl.useProgram(0);
-    }
-
-    Delete()
-    {
-        this.#gl.detachShader(this.#vertShader);
-        this.#gl.detachShader(this.#fragShader);
-
-        this.#gl.deleteShader(this.#vertShader);
-        this.#gl.deleteShader(this.#fragShader);
-
-        this.#gl.deleteProgram(this.program);
     }
 }
 

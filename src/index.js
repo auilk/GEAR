@@ -52,7 +52,7 @@ async function main()
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-    const aPosLoc = gl.getAttribLocation(shader.program, "aPosition")
+    const aPosLoc = gl.getAttribLocation(shader.GetProgram(), "aPosition")
     gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosLoc);
 
