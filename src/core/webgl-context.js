@@ -1,5 +1,6 @@
 class WebGLContext
 {
+    /**@type {WebGLRenderingContext} */
     static #gl = null;
 
     static Init(canvas)

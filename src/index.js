@@ -1,3 +1,4 @@
+import VertexBuffer from "./core/vertex-buffer.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
 
@@ -41,9 +42,7 @@ async function main()
     const VAO = gl.createVertexArray();
     gl.bindVertexArray(VAO);
 
-    const VBO = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    const VBO = new VertexBuffer(vertices, gl.STATIC_DRAW);
 
     const EBO = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
