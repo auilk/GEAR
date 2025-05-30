@@ -1,3 +1,4 @@
+import IndexBuffer from "./core/index-buffer.js";
 import VertexBuffer from "./core/vertex-buffer.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
@@ -43,10 +44,7 @@ async function main()
     gl.bindVertexArray(VAO);
 
     const VBO = new VertexBuffer(vertices, gl.STATIC_DRAW);
-
-    const EBO = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+    const IBO = new IndexBuffer(indices, gl.STATIC_DRAW);
 
     const aPosLoc = gl.getAttribLocation(shader.GetProgram(), "aPosition")
     gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
