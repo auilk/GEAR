@@ -15,6 +15,8 @@ class Shader
         this.#fragShader = this.#CreateShader(fragSource, this.#gl.FRAGMENT_SHADER);
 
         this.#program = this.#CreateProgram(this.#vertShader, this.#fragShader);
+
+        this.#gl.useProgram(this.#program);
     }
 
     GetProgram()

@@ -50,6 +50,7 @@ class VertexArray
     #Create()
     {
         this.#id = this.#gl.createVertexArray();
+        this.#gl.bindVertexArray(this.#id);
     }
 }
 

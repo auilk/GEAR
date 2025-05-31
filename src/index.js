@@ -29,7 +29,6 @@ async function main()
     const fragSrc = await LoadShaderSrc("./assets/shaders/fragment.fs");
 
     const shader = new Shader(vertSrc, fragSrc);
-    shader.Bind();
 
     const vertices = new Float32Array([
          0.0,  1.0,
@@ -42,7 +41,6 @@ async function main()
     ]);
 
     const VAO = new VertexArray();
-    VAO.Bind();
     VAO.AddVertexBuffer("VBO", vertices);
     VAO.AddIndexBuffer("IBO", indices);
 
