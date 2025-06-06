@@ -31,29 +31,31 @@ async function main()
     const shader = new Shader(vertSrc, fragSrc);
 
     const vertices = new Float32Array([
-         0.0,  1.0,
-        -1.0, -1.0,
-         1.0, -1.0
+        -1.0,  1.0, 0.0,    0.0, 1.0,
+        -1.0, -1.0, 0.0,    0.0, 0.0,
+         1.0, -1.0, 0.0,    1.0, 0.0,
+         1.0,  1.0, 0.0,    1.0, 1.0
+         
     ]);
 
-    const indices = new Uint32Array([
-        0, 1, 2
+    const indices = new Uint16Array([
+        0, 1, 2,
+        2, 3, 0
     ]);
 
     const VAO = new VertexArray();
     VAO.AddVertexBuffer("VBO", vertices);
     VAO.AddIndexBuffer("IBO", indices);
-
-    const aPosLoc = gl.getAttribLocation(shader.GetProgram(), "aPosition")
-    gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(aPosLoc);
-
+    VAO.AddAttrib("aPosition", "vec3");
+    VAO.AddAttrib("aTexCoord", "vec2");
+    VAO.SetLayout(shader.GetProgram());
+    
     const RenderLoop = () =>
     {
         gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     
         requestAnimationFrame(RenderLoop);
     }
