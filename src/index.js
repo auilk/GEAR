@@ -49,6 +49,25 @@ async function main()
     VAO.AddAttrib("aPosition", "vec3");
     VAO.AddAttrib("aTexCoord", "vec2");
     VAO.SetLayout(shader.GetProgram());
+
+    const texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    const image = new Image();
+    image.src = "../assets/textures/wooden-crate.png";
+    image.onload = () =>
+    {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    };
+
+    gl.uniform1i(gl.getUniformLocation(shader.GetProgram(), "uTexture"), texture);
+
     
     const RenderLoop = () =>
     {
