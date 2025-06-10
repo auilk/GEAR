@@ -50,6 +50,34 @@ class Texture
         Texture.#count++;
     }
 
+    SetFilter(filter)
+    {
+        this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_MIN_FILTER, this.#filter.min);
+        this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_MAG_FILTER, this.#filter.mag);
+    }
+
+    SetWrap(wrap)
+    {
+        this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_S, this.#wrap);
+        this.#gl.texParameteri(this.#gl.TEXTURE_2D, this.#gl.TEXTURE_WRAP_T, this.#wrap);
+    }
+
+
+    Bind()
+    {
+        this.#gl.bindTexture(this.#gl.TEXTURE_2D, this.#texture);
+    }
+
+    Unbind()
+    {
+        this.#gl.bindTexture(this.#gl.TEXTURE_2D, 0);
+    }
+
+    Delete()
+    {
+        this.#gl.deleteTexture(this.#gl.texture);
+    }
+
     #CreateTexture()
     {
         const texture = this.#gl.createTexture();
@@ -67,7 +95,7 @@ class Texture
 
         if (this.#filter.anisotropy)
         {
-            const ext = this.#gl.getExtension('EXT_texture_filter_anisotropic') || this.#gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || this.#gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
+            const ext = this.#gl.getExtension("EXT_texture_filter_anisotropic") || this.#gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || this.#gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
             if (ext)
             {
                 const max = this.#gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
