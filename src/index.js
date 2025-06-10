@@ -49,8 +49,11 @@ async function main()
     VAO.AddAttrib("aTexCoord", "vec2");
     VAO.SetLayout(shader.GetProgram());
 
-    // Texture Source: Author: Philman401, URL: https://opengameart.org/content/simple-toon-wooden-crate-texture
-    const texture = new Texture("../assets/textures/brick-wall.png", shader, "uTexture");
+    // Texture Source: Author: Philman401, LICNSE: CC0, URL: https://opengameart.org/content/simple-toon-wooden-crate-texture
+    const texture01 = new Texture("../assets/textures/wooden-crate.png", shader, "uTexture01");
+
+    // Texture Source: Author: xmorg; LICNSE: CC0; URL: https://opengameart.org/node/10617;
+    const texture02 = new Texture("../assets/textures/brick-wall.png", shader, "uTexture02");
     
     const RenderLoop = () =>
     {

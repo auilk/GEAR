@@ -23,25 +23,29 @@ class Texture
     #filter;
     #wrap;
 
-    constructor(path, shader, uName, wrap = Texture.CLAMP, filter = Texture.SHARP_MIPMAP)
+    constructor(path, shader, uName, wrap = Texture.CLAMP, filter = Texture.SMOOTH)
     {
         this.#gl = WebGLContext.GetContext();
         this.#id = Texture.#count;
         this.#wrap = wrap;
         this.#filter = filter;
 
-        this.#texture = this.#CreateTexture();
-
         const image = new Image();
         image.src = path;
         image.onload = () =>
         {
+            this.#texture = this.#CreateTexture();
             this.#gl.texImage2D(this.#gl.TEXTURE_2D, 0, this.#gl.RGBA, this.#gl.RGBA, this.#gl.UNSIGNED_BYTE, image);
             this.#SetParams();
-
+            this.#gl.uniform1i(this.#gl.getUniformLocation(shader.GetProgram(), uName), this.#id);
         };
-
-        this.#gl.uniform1i(this.#gl.getUniformLocation(shader.GetProgram(), uName), this.#texture);
+        image.onerror = () =>
+        {
+            this.#texture = this.#CreateTexture();
+            this.#gl.texImage2D(this.#gl.TEXTURE_2D, 0, this.#gl.RGB, 1, 1, 0, this.#gl.RGB,this.#gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 255]));
+            this.#SetParams();
+            this.#gl.uniform1i(this.#gl.getUniformLocation(shader.GetProgram(), uName), this.#id);
+        }
 
         Texture.#count++;
     }
@@ -68,7 +72,6 @@ class Texture
             {
                 const max = this.#gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
                 this.#gl.texParameterf(this.#gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, max);
-                console.log("ANISO WORKS ", max);
             }
         }
 
