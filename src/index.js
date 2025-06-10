@@ -1,8 +1,7 @@
-import IndexBuffer from "./core/index-buffer.js";
 import VertexArray from "./core/vertex-array.js";
-import VertexBuffer from "./core/vertex-buffer.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
+import Texture from "./graphics/texture.js";
 
 const canvas = document.getElementById("webgl-canvas");
 
@@ -50,24 +49,8 @@ async function main()
     VAO.AddAttrib("aTexCoord", "vec2");
     VAO.SetLayout(shader.GetProgram());
 
-    const texture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-    const image = new Image();
-    image.src = "../assets/textures/wooden-crate.png";
-    image.onload = () =>
-    {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    };
-
-    gl.uniform1i(gl.getUniformLocation(shader.GetProgram(), "uTexture"), texture);
-
+    // Texture Source: Author: Philman401, URL: https://opengameart.org/content/simple-toon-wooden-crate-texture
+    const texture = new Texture("../assets/textures/brick-wall.png", shader, "uTexture");
     
     const RenderLoop = () =>
     {
