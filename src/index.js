@@ -2,6 +2,8 @@ import VertexArray from "./core/vertex-array.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
 import Texture from "./graphics/texture.js";
+import Matrix3d from "./math/matrix3.js";
+import Vector2 from "./math/vector2.js";
 
 const canvas = document.getElementById("webgl-canvas");
 
@@ -30,10 +32,10 @@ async function main()
     const shader = new Shader(vertSrc, fragSrc);
 
     const vertices = new Float32Array([
-        -1.0,  1.0, 0.0,    0.0, 1.0,
-        -1.0, -1.0, 0.0,    0.0, 0.0,
-         1.0, -1.0, 0.0,    1.0, 0.0,
-         1.0,  1.0, 0.0,    1.0, 1.0
+        -1.0,  1.0, 1.0,    0.0, 1.0,
+        -1.0, -1.0, 1.0,    0.0, 0.0,
+         1.0, -1.0, 1.0,    1.0, 0.0,
+         1.0,  1.0, 1.0,    1.0, 1.0
          
     ]);
 
@@ -54,6 +56,12 @@ async function main()
 
     // Texture Source: Author: xmorg; LICNSE: CC0; URL: https://opengameart.org/node/10617;
     const texture02 = new Texture("../assets/textures/brick-wall.png", shader, "uTexture02");
+
+    const model = new Matrix3d();
+    model.Translate(new Vector2(0.5, 0.5));
+    model.Rotate(45);
+    model.Scale(new Vector2(0.5, 0.5));
+    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
     
     const RenderLoop = () =>
     {
