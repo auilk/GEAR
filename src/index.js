@@ -1,8 +1,9 @@
+import Camera from "./components/camera.js";
 import VertexArray from "./core/vertex-array.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
 import Texture from "./graphics/texture.js";
-import Matrix3d from "./math/matrix3.js";
+import Matrix3 from "./math/matrix3.js";
 import Vector2 from "./math/vector2.js";
 
 const canvas = document.getElementById("webgl-canvas");
@@ -57,16 +58,24 @@ async function main()
     // Texture Source: Author: xmorg; LICNSE: CC0; URL: https://opengameart.org/node/10617;
     const texture02 = new Texture("../assets/textures/brick-wall.png", shader, "uTexture02");
 
-    const model = new Matrix3d();
-    model.Translate(new Vector2(0.5, 0.5));
-    model.Rotate(45);
-    model.Scale(new Vector2(0.5, 0.5));
-    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
-    
+    const camera = new Camera(new Vector2(0.5, 0.5));
+    camera.OrthoProjection(canvas);
+    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uView"), false, camera.view.values);
+    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uProjection"), false, camera.projection.values);
+
     const RenderLoop = () =>
     {
         gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        const model = new Matrix3();
+        model.Translate(canvas.offsetWidth / 2, canvas.offsetHeight / 2);
+        model.Scale(100, 100);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
+
+        camera.OrthoProjection(canvas);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uView"), false, camera.view.values);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uProjection"), false, camera.projection.values);
 
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     
