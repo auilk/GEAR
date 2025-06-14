@@ -58,10 +58,7 @@ async function main()
     // Texture Source: Author: xmorg; LICNSE: CC0; URL: https://opengameart.org/node/10617;
     const texture02 = new Texture("../assets/textures/brick-wall.png", shader, "uTexture02");
 
-    const camera = new Camera(new Vector2(0.5, 0.5));
-    camera.OrthoProjection(canvas);
-    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uView"), false, camera.view.values);
-    gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uProjection"), false, camera.projection.values);
+    const camera = new Camera(canvas.offsetWidth, canvas.offsetHeight);
 
     const RenderLoop = () =>
     {
@@ -73,7 +70,8 @@ async function main()
         model.Scale(100, 100);
         gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
 
-        camera.OrthoProjection(canvas);
+        camera.width = canvas.offsetWidth;
+        camera.height = canvas.offsetHeight;
         gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uView"), false, camera.view.values);
         gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uProjection"), false, camera.projection.values);
 
@@ -81,8 +79,16 @@ async function main()
     
         requestAnimationFrame(RenderLoop);
     }
-    
     requestAnimationFrame(RenderLoop);
+
+    const ResizeCallback = () =>
+    {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        camera.width = canvas.width;
+        camera.height = canvas.height;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
     
     window.addEventListener("resize", ResizeCallback);
     ResizeCallback();
