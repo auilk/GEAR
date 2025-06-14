@@ -1,6 +1,6 @@
-import WebGLContext from "./webgl-context.js";
+import WebGLContext from "../core/webgl-context.js";
 
-class VertexBuffer
+class IndexBuffer
 {
     #gl;
     #buffer;
@@ -14,7 +14,7 @@ class VertexBuffer
 
     Bind()
     {
-       this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#buffer);
+       this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#buffer);
     }
 
     Unbind()
@@ -30,11 +30,11 @@ class VertexBuffer
     #CreateBuffer(data, draw)
     {
         const buffer = this.#gl.createBuffer();
-        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, buffer);
-        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, data, draw);
+        this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, buffer);
+        this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, data, draw);
         
         return buffer;
     }
 }
 
-export default VertexBuffer;
+export default IndexBuffer;

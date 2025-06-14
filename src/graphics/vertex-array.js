@@ -1,4 +1,4 @@
-import WebGLContext from "./webgl-context.js";
+import WebGLContext from "../core/webgl-context.js";
 import VertexBuffer from "./vertex-buffer.js"
 import IndexBuffer from "./index-buffer.js";
 import VertexAttrib from "./vertex-attrib.js";

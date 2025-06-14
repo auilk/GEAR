@@ -1,5 +1,5 @@
 import Camera from "./components/camera.js";
-import VertexArray from "./core/vertex-array.js";
+import VertexArray from "./graphics/vertex-array.js";
 import WebGLContext from "./core/webgl-context.js";
 import Shader from "./graphics/shader.js";
 import Texture from "./graphics/texture.js";
