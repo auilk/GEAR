@@ -1,6 +1,6 @@
 import WebGLContext from "../core/webgl-context.js";
 
-class Shader
+class ShaderProgram
 {
     #gl;
     #vertShader;
@@ -88,4 +88,4 @@ class Shader
     }
 }
 
-export default Shader;
+export default ShaderProgram;

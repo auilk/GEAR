@@ -7,8 +7,14 @@ out vec4 FragColor;
 
 uniform sampler2D uTexture01;
 uniform sampler2D uTexture02;
+uniform int uSnippetID;
+
+//SNIPPETS START
+//SNIPPETS END
 
 void main()
 {
-    FragColor = mix(texture(uTexture01, vTexCoord), texture(uTexture02, vTexCoord), 0.5);
+    //BRANCH START
+    //BRANCH END
+    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
