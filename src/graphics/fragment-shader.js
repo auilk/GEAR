@@ -1,6 +1,6 @@
 class FragmentShader
 {
-    static count = 0;
+    static count = 1;
     static fsnippet = "";
     static bsnippet = "";
 
@@ -32,12 +32,12 @@ class FragmentShader
             end = this.src.indexOf('}', end);
         }
 
-        return `void id_${this.id}_main()\n` + this.src.slice(start, end + 1) + '\n';
+        return `vec4 id_${this.id}_main()\n{\n\tvec4 COLOR;` + this.src.slice(start + 1, end) + '\treturn COLOR;\n}\n';
     }
 
     #ParseBranchSnippet()
     {
-        return `if (uSnippetID == ${this.id}) { id_${this.id}_main(); }\n\t`;
+        return `if (uSnippetID == ${this.id}) { COLOR = id_${this.id}_main(); }\n\t`;
     }
 
     #CountLines()

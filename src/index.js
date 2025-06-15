@@ -2,28 +2,20 @@ import FragmentShader from "./graphics/fragment-shader.js";
 import ShaderProgram from "./graphics/shader-program.js";
 import WebGLContext from "./core/webgl-context.js";
 import VertexArray from "./graphics/vertex-array.js";
+import Camera from "./components/camera.js";
+import Matrix3 from "./math/matrix3.js";
 
 const canvas = document.getElementById("webgl-canvas");
 
 WebGLContext.Init(canvas);
 const gl = WebGLContext.GetContext();
 
-async function LoadShaderSrc(path)
-{
-    const response = await fetch(path);
-    if (!response.ok) throw new Error(`Failed to load shader: ${response.statusText}`)
-    return await response.text();
-}
-
 async function main()
 {
-    const vert01 = await FragmentShader.LoadShaderSrc("./assets/shaders/test01.shdr");
-    const vert02 = await FragmentShader.LoadShaderSrc("./assets/shaders/test02.shdr");
+    const frag01 = await FragmentShader.LoadShaderSrc("./assets/shaders/test01.shdr");
+    const frga02 = await FragmentShader.LoadShaderSrc("./assets/shaders/test02.shdr");
 
-    const vertSrc = await LoadShaderSrc("./assets/shaders/vertex.vs");
-    const fragSrc = await LoadShaderSrc("./assets/shaders/fragment.fs");
-
-    const shader = new ShaderProgram(vertSrc, fragSrc);
+    const shader = new ShaderProgram();
 
     const vertices = new Float32Array([
         -1.0,  1.0,
@@ -43,10 +35,33 @@ async function main()
     VAO.AddAttrib("aPosition", "vec2");
     VAO.SetLayout(shader.GetProgram());
 
+    const cam = new Camera(canvas.offsetWidth, canvas.offsetHeight);
+
     const RenderLoop = () =>
     {
         gl.clearColor(0.1, 0.1, 0.1, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        cam.width = canvas.offsetWidth;
+        cam.height = canvas.offsetHeight;
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uView"), false, cam.view.values);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uProjection"), false, cam.projection.values);
+
+        
+        let model = new Matrix3();
+        model.Translate(canvas.offsetWidth / 3, canvas.offsetHeight / 2);
+        model.Scale(128, 128);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
+        gl.uniform1i(gl.getUniformLocation(shader.GetProgram(), "uSnippetID"), 1);
+
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+        model = new Matrix3();
+        model.Translate(canvas.offsetWidth / 3 * 2, canvas.offsetHeight / 2);
+        model.Scale(128, 128);
+        gl.uniformMatrix3fv(gl.getUniformLocation(shader.GetProgram(), "uModel"), false, model.values);
+        gl.uniform1i(gl.getUniformLocation(shader.GetProgram(), "uSnippetID"), 2);
+
 
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     
