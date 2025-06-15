@@ -9,6 +9,8 @@ class ShaderProgram
     #fragShader;
     #fragSrc;
     #program;
+    #fsnippetFs;
+    #bsnippetFs
 
     constructor()
     {
@@ -50,6 +52,9 @@ class ShaderProgram
             FragColor = COLOR;
         }`;
 
+        this.#fsnippetFs = "";
+        this.#bsnippetFs = "";
+
         this.#AssembleShader(); 
         
         this.#vertShader = this.#CreateShader(this.#vertSrc, this.#gl.VERTEX_SHADER);
@@ -86,10 +91,33 @@ class ShaderProgram
         this.#gl.deleteProgram(this.#program);
     }
 
+    #ParseFragFuncSnippet(src, id)
+    {
+        let start = src.indexOf("void main()");
+        let end = 0;
+        if (start !== -1)
+        {
+            start = src.indexOf('{', start);
+            end = src.indexOf('}', end);
+        }
+
+        return `vec4 id_${id}_main()\n{\n\tvec4 COLOR;` + src.slice(start + 1, end) + '\treturn COLOR;\n}\n';
+    }
+
+    #ParseFragBranchSnippet(id)
+    {
+        return `if (uSnippetID == ${id}) { COLOR = id_${id}_main(); }\n\t`;
+    }
+
     #AssembleShader()
     {
+        for (let i = 0; i < FragmentShader.frags.length; i++)
+        {
+            this.#fsnippetFs += this.#ParseFragFuncSnippet(FragmentShader.frags[i].src, FragmentShader.frags[i].id);
+            this.#bsnippetFs += this.#ParseFragBranchSnippet(FragmentShader.frags[i].id);
+        }
         this.#fragSrc = this.#fragSrc.split("//SPLIT_HERE");
-        this.#fragSrc = this.#fragSrc[0] + FragmentShader.fsnippet + this.#fragSrc[1] + FragmentShader.bsnippet + this.#fragSrc[2];
+        this.#fragSrc = this.#fragSrc[0] + this.#fsnippetFs + this.#fragSrc[1] + this.#bsnippetFs + this.#fragSrc[2];
     }
 
     #CreateShader(source, type)

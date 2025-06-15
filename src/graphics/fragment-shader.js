@@ -1,8 +1,6 @@
 class FragmentShader
 {
-    static count = 1;
-    static fsnippet = "";
-    static bsnippet = "";
+    static frags = [];
 
     static async LoadShaderSrc(path)
     {
@@ -16,28 +14,9 @@ class FragmentShader
     {
         this.src = src;
         this.lines = this.#CountLines();
-        this.id = FragmentShader.count++;
-        
-        FragmentShader.fsnippet += this.#ParseFuncSnippet();
-        FragmentShader.bsnippet += this.#ParseBranchSnippet();
-    }
 
-    #ParseFuncSnippet()
-    {
-        let start = this.src.indexOf("void main()");
-        let end = 0;
-        if (start !== -1)
-        {
-            start = this.src.indexOf('{', start);
-            end = this.src.indexOf('}', end);
-        }
-
-        return `vec4 id_${this.id}_main()\n{\n\tvec4 COLOR;` + this.src.slice(start + 1, end) + '\treturn COLOR;\n}\n';
-    }
-
-    #ParseBranchSnippet()
-    {
-        return `if (uSnippetID == ${this.id}) { COLOR = id_${this.id}_main(); }\n\t`;
+        FragmentShader.frags.push(this);
+        this.id = FragmentShader.frags.length;
     }
 
     #CountLines()
