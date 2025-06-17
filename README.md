@@ -1,15 +1,12 @@
 # GEAR
 
-**GEAR** is a JavaScript library for 2D and 3D rendering on the web. It aims to provide a flexible and lightweight API for building interactive graphics using WebGL.
+**GEAR** is a lightweight JavaScript library for high-performance 2D rendering, with 3D support planned for future releases. Built directly on top of WebGL, GEAR gives you full control over the GPU while offering a minimal, modern API for interactive web graphics.
 
 ## Goals
-
-- Unified 2D and 3D rendering system
-- Minimal and intuitive API
-- Built on top of raw WebGL for full control
-- Modular and extensible design
+- Unified rendering pipeline for both 2D (now) and 3D (soon)
+- Minimal, easy-to-learn API without sacrificing power
+- Built directly on raw WebGL for precision and performance
+- Modular architecture for maximum flexibility and extensibility
 
 ## License
-
-This project is licensed under the [MIT License](LICENSE).
-You are free to use, modify, and distribute this software with attribution.
+Licensed under the [MIT License](LICENSE).
