@@ -1,50 +1,42 @@
 import WebGLContext from "../core/webgl-context.js";
-import FragmentShader from "./fragment-shader.js";
 
 class ShaderProgram
 {
-    #gl;
-    #vertShader;
-    #vertSrc;
-    #fragShader;
-    #fragSrc;
-    #program;
-    #fsnippetFs;
-    #bsnippetFs
+    static id;
+    static frags = [];
 
-    constructor()
+    
+    static BuildShaderProgram()
     {
-        this.#gl = WebGLContext.GetContext();
-
-        this.#vertSrc =
+        let vertSrc =
         `#version 300 es
         #pragma vscode_glsllint_stage : vert
         precision mediump float;
-
+    
         in vec2 aPosition;
-
+    
         uniform mat3 uModel;
         uniform mat3 uView;
         uniform mat3 uProjection;
-
+    
         void main()
         {
             gl_Position = vec4(uProjection * uView * uModel * vec3(aPosition, 1.0), 1.0);
         }`;
-
-        this.#fragSrc = 
+        
+        let fragSrc = 
         `#version 300 es
         #pragma vscode_glsllint_stage : frag
         precision mediump float;
-
+    
         out vec4 FragColor;
-
+    
         uniform sampler2D uTexture01;
         uniform sampler2D uTexture02;
         uniform int uSnippetID;
-
+    
         //SPLIT_HERE
-
+    
         void main()
         {
             vec4 COLOR = vec4(1.0);
@@ -52,46 +44,26 @@ class ShaderProgram
             FragColor = COLOR;
         }`;
 
-        this.#fsnippetFs = "";
-        this.#bsnippetFs = "";
-
-        this.#AssembleShader(); 
+        let fsnippetFs = "";
+        let bsnippetFs = "";
         
-        this.#vertShader = this.#CreateShader(this.#vertSrc, this.#gl.VERTEX_SHADER);
-        this.#fragShader = this.#CreateShader(this.#fragSrc, this.#gl.FRAGMENT_SHADER);
+        for (let i = 0; i < ShaderProgram.frags.length; i++)
+        {
+            fsnippetFs += ShaderProgram.#ParseFragFuncSnippet(ShaderProgram.frags[i].src, ShaderProgram.frags[i].id);
+            bsnippetFs += ShaderProgram.#ParseFragBranchSnippet(ShaderProgram.frags[i].id);
+        }
+        fragSrc = fragSrc.split("//SPLIT_HERE");
+        fragSrc = fragSrc[0] + fsnippetFs + fragSrc[1] + bsnippetFs + fragSrc[2];
 
-        this.#program = this.#CreateProgram(this.#vertShader, this.#fragShader);
+        const vertShader = ShaderProgram.#CreateShader(vertSrc, WebGLContext.GetContext().VERTEX_SHADER);
+        const fragShader = ShaderProgram.#CreateShader(fragSrc, WebGLContext.GetContext().FRAGMENT_SHADER);
 
-        this.#gl.useProgram(this.#program);
+        ShaderProgram.id = ShaderProgram.#CreateProgram(vertShader, fragShader);
+
+        WebGLContext.GetContext().useProgram(ShaderProgram.id);
     }
 
-    GetProgram()
-    {
-        return this.#program;
-    }
-    
-    Bind()
-    {
-        this.#gl.useProgram(this.#program);
-    }
-
-    Unbind()
-    {
-        this.#gl.useProgram(0);
-    }
-
-    Delete()
-    {
-        this.#gl.detachShader(this.#vertShader);
-        this.#gl.detachShader(this.#fragShader);
-
-        this.#gl.deleteShader(this.#vertShader);
-        this.#gl.deleteShader(this.#fragShader);
-
-        this.#gl.deleteProgram(this.#program);
-    }
-
-    #ParseFragFuncSnippet(src, id)
+    static #ParseFragFuncSnippet(src, id)
     {
         let start = src.indexOf("void main()");
         let end = 0;
@@ -104,36 +76,25 @@ class ShaderProgram
         return `vec4 id_${id}_main()\n{\n\tvec4 COLOR;` + src.slice(start + 1, end) + '\treturn COLOR;\n}\n';
     }
 
-    #ParseFragBranchSnippet(id)
+    static #ParseFragBranchSnippet(id)
     {
         return `if (uSnippetID == ${id}) { COLOR = id_${id}_main(); }\n\t`;
     }
 
-    #AssembleShader()
+    static #CreateShader(source, type)
     {
-        for (let i = 0; i < FragmentShader.frags.length; i++)
+        const shader = WebGLContext.GetContext().createShader(type);
+        WebGLContext.GetContext().shaderSource(shader, source);
+        WebGLContext.GetContext().compileShader(shader);
+
+        if (!WebGLContext.GetContext().getShaderParameter(shader, WebGLContext.GetContext().COMPILE_STATUS))
         {
-            this.#fsnippetFs += this.#ParseFragFuncSnippet(FragmentShader.frags[i].src, FragmentShader.frags[i].id);
-            this.#bsnippetFs += this.#ParseFragBranchSnippet(FragmentShader.frags[i].id);
-        }
-        this.#fragSrc = this.#fragSrc.split("//SPLIT_HERE");
-        this.#fragSrc = this.#fragSrc[0] + this.#fsnippetFs + this.#fragSrc[1] + this.#bsnippetFs + this.#fragSrc[2];
-    }
+            const infoLog = WebGLContext.GetContext().getShaderInfoLog(shader);
 
-    #CreateShader(source, type)
-    {
-        const shader = this.#gl.createShader(type);
-        this.#gl.shaderSource(shader, source);
-        this.#gl.compileShader(shader);
-
-        if (!this.#gl.getShaderParameter(shader, this.#gl.COMPILE_STATUS))
-        {
-            const infoLog = this.#gl.getShaderInfoLog(shader);
-
-            const typeName = type === this.#gl.VERTEX_SHADER ? "Vertex" : "Fragment";
+            const typeName = type === WebGLContext.GetContext().VERTEX_SHADER ? "Vertex" : "Fragment";
             console.error(`${typeName} shader compilation has failed:\n${infoLog}`);
             
-            this.#gl.deleteShader(shader);
+            WebGLContext.GetContext().deleteShader(shader);
 
             return null;
         }
@@ -141,20 +102,20 @@ class ShaderProgram
         return shader;
     }
 
-    #CreateProgram(vertShader, fragShader)
+    static #CreateProgram(vertShader, fragShader)
     {
-        const program = this.#gl.createProgram();
-        this.#gl.attachShader(program, vertShader);
-        this.#gl.attachShader(program, fragShader);
-        this.#gl.linkProgram(program);
+        const program = WebGLContext.GetContext().createProgram();
+        WebGLContext.GetContext().attachShader(program, vertShader);
+        WebGLContext.GetContext().attachShader(program, fragShader);
+        WebGLContext.GetContext().linkProgram(program);
 
-        if (!this.#gl.getProgramParameter(program, this.#gl.LINK_STATUS))
+        if (!WebGLContext.GetContext().getProgramParameter(program, WebGLContext.GetContext().LINK_STATUS))
         {
-            const infoLog = this.#gl.getProgramInfoLog(program);
+            const infoLog = WebGLContext.GetContext().getProgramInfoLog(program);
 
             console.error(`Shader program linking has failder:\n${infoLog}`);
             
-            this.#gl.deleteProgram(program);
+            WebGLContext.GetContext().deleteProgram(program);
 
             return null;
         }

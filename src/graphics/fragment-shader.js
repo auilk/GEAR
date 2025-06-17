@@ -1,7 +1,7 @@
+import ShaderProgram from "./shader-program.js";
+
 class FragmentShader
 {
-    static frags = [];
-
     static async LoadShaderSrc(path)
     {
         const response = await fetch(path);
@@ -15,8 +15,8 @@ class FragmentShader
         this.src = src;
         this.lines = this.#CountLines();
 
-        FragmentShader.frags.push(this);
-        this.id = FragmentShader.frags.length;
+        ShaderProgram.frags.push(this);
+        this.id = ShaderProgram.frags.length;
     }
 
     #CountLines()
@@ -30,6 +30,7 @@ class FragmentShader
         }
         return lines;
     }
+
 }
 
 export default FragmentShader;
