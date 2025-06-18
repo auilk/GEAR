@@ -1,59 +1,74 @@
 function Tokenise(src)
 {
     const tokens = [];
-    const maxInt = Number.MAX_SAFE_INTEGER;
     const len = src.length;
+    const stopAt = new Set(['\n', ' ', '+', '-', '*', '/', '=', ';']);
 
     let start = 0;
     let end = 0;
     while (start < len)
     {
-        if (src[start] === " " || src[start] === '\n')
+        while(end < len && !stopAt.has(src[end])) end++;
+
+        const value = src.substring(start, start === end ? ++end : end);
+
+        let type;
+        if (value === '+')
         {
-            start++;
+            type = "ADDITION";
+        }
+        else if(value === '-')
+        {
+            type = "SUBSTRACTION";
+        }
+        else if(value === '*')
+        {
+            type = "MULTIPLICATION";
+        }
+        else if(value === '/')
+        {
+            type = "DIVISION";
+        }
+        if (value === '=')
+        {
+            type = "EQUAL";
+        }
+        else if (value === ';')
+        {
+            type = "SEMI_COLON";
+        } 
+        else if (value === "int" || value === "float")
+        {
+            type = "KEYWORD";
+        } 
+        else if (!isNaN(value)) 
+        {
+            type = Number.isInteger(Number(value)) ? "INT_LITERAL" : "FLOAT_LITERAL";
+        }
+        else if (!(value[0] >= '0' && value[0] <= '9'))
+        {
+            for (let i = 0; i < value.length; i++)
+            {
+                let ch = value[i];
+                if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch === '_')
+                {
+                    type = "IDENTIFIER";
+                }
+                else
+                {
+                    type = "UNKNOWN";
+                    break;
+                }
+            }
         }
         else
         {
-            let space = src.indexOf(" ", start);
-            let equal = src.indexOf("=", start);
-            let semicolon = src.indexOf(";", start);
-    
-            space = space === -1 ? maxInt : space;
-            equal = equal === -1 ? maxInt : equal;
-            semicolon = semicolon === -1 ? maxInt : semicolon;
-
-            end = Math.min(space, equal, semicolon);
-            end = end === maxInt ? src.length : end;
-            end = start === end ? end + 1 : end;
-    
-            const value = src.substring(start, end);
-    
-            let type;
-            if (value === "=")
-            {
-                type = "EQUAL";
-            }
-            else if (value === ";")
-            {
-                type = "SEMI_COLON";
-            } 
-            else if (value === "int" || value === "float")
-            {
-                type = "KEYWORD";
-            } 
-            else if (!isNaN(value)) 
-            {
-                type = Number.isInteger(Number(value)) ? "INT_LITERAL" : "FLOAT_LITERAL";
-            } 
-            else 
-            {
-                type = "IDENTIFIER";
-            }
-    
-            tokens.push({ type: type, value: value});
-    
-            start = end;
+            type = "UNKNOWN";
         }
+
+        tokens.push({ type: type, value: value});
+
+        start = src[end] === ' '  || src[end] === '\n' ? ++end : end;
     }
 
     return tokens;
