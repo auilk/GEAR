@@ -12,7 +12,6 @@ function Tokenise(src)
 
         const value = src.substring(start, start === end ? ++end : end);
 
-        debugger;
         let type;
         if (value === '+')
         {
@@ -20,7 +19,7 @@ function Tokenise(src)
         }
         else if(value === '-')
         {
-            type = "SUBSTRACTION";
+            type = "SUBTRACTION";
         }
         else if(value === '*')
         {
@@ -74,3 +73,63 @@ function Tokenise(src)
 
     return tokens;
 }
+
+function Parse(tokens)
+{
+    const output = [];
+    let i = 0;
+
+
+    const ParsePrimary = (tokens) =>
+    {
+        if (tokens[i].type === "IDENTIFIER" || tokens[i].type === "INT_LITERAL" || tokens[i].type === "FLOAT_LITERAL")
+        {
+            return tokens[i++].value;
+        }
+
+        throw new Error("Unexpected expression");
+    }
+
+    const ParseAddition = (tokens) =>
+    {
+        let left = ParsePrimary(tokens);
+
+        while (tokens[i].type === "ADDITION" || tokens[i].type === "SUBTRACTION")
+        {
+            const operator = tokens[i++].value;
+            const right = ParsePrimary(tokens);
+            left = `(${left} ${operator} ${right})`;
+        }
+        
+        return left;
+    }
+
+    const ParseExpresion = (tokens) =>
+    {
+        return ParseAddition(tokens);
+    }
+
+    while (i < tokens.length)
+    {
+        let typeToken;
+        if (tokens[i].type === "KEYWORD") typeToken = tokens[i++];
+        const varType = typeToken.value;
+
+        let idToken;
+        if (tokens[i].type === "IDENTIFIER") idToken = tokens[i++];
+        const varId = idToken.value;
+
+        if (tokens[i].type === "EQUAL") i++;
+
+        let varExpr = ParseExpresion(tokens);
+
+        if (tokens[i].type === "SEMI_COLON") i++;
+
+        output.push(`${varType} ${varId} = ${varExpr};`);
+    }
+
+    return output.join('\n');
+}
+
+const tokens = Tokenise("int x = 5 + 5 + 5 - 10;");
+console.log(Parse(tokens));
