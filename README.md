@@ -1,6 +1,6 @@
-# GEAR
+# SABLE
 
-**GEAR** is a lightweight JavaScript library for high-performance 2D rendering, with 3D support planned for future releases. Built directly on top of WebGL, GEAR gives you full control over the GPU while offering a minimal, modern API for interactive web graphics.
+**SABLE** is a lightweight JavaScript library for high-performance 2D rendering, with 3D support planned for future releases. Built directly on top of WebGL, SABLE gives you full control over the GPU while offering a minimal, modern API for interactive web graphics.
 
 ## Goals
 - Unified rendering pipeline for both 2D (now) and 3D (soon)
