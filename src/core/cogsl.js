@@ -8,6 +8,8 @@ function Tokenise(src)
     let end = 0;
     while (start < len)
     {
+        while (src[start] === ' ' || start[start] === '\n') start++;
+        end = start;
         while(end < len && !stopAt.has(src[end])) end++;
 
         const value = src.substring(start, start === end ? ++end : end);
@@ -86,8 +88,6 @@ function Parse(tokens)
         {
             return tokens[i++].value;
         }
-
-        throw new Error("Unexpected expression");
     }
 
     const ParseAddition = (tokens) =>
@@ -123,7 +123,7 @@ function Parse(tokens)
 
         let varExpr = ParseExpresion(tokens);
 
-        if (tokens[i].type === "SEMI_COLON") i++;
+        while (i < tokens.length) if (tokens[i].type === "SEMI_COLON") i++;
 
         output.push(`${varType} ${varId} = ${varExpr};`);
     }
@@ -131,5 +131,5 @@ function Parse(tokens)
     return output.join('\n');
 }
 
-const tokens = Tokenise("int x = 5 + 5 + 5 - 10;");
+const tokens = Tokenise("   int x = 5;;;;");
 console.log(Parse(tokens));
