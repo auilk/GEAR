@@ -12,6 +12,7 @@ function Tokenise(src)
 
         const value = src.substring(start, start === end ? ++end : end);
 
+        debugger;
         let type;
         if (value === '+')
         {
@@ -29,7 +30,7 @@ function Tokenise(src)
         {
             type = "DIVISION";
         }
-        if (value === '=')
+        else if (value === '=')
         {
             type = "EQUAL";
         }
